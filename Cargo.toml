@@ -3,6 +3,12 @@ name = "overpunch"
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
+readme = "README.md"
+description = "support for signed overpunch numbers"
+homepage = "https://github.com/capitalrx/overpunch"
+repository = "https://github.com/capitalrx/overpunch"
+keywords = ["overpunch", "cobol", "ibm", "mainframe"]
+categories = ["finance", "parsing", "value-formatting"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
