@@ -97,6 +97,22 @@ static FORMAT_REF: LazyLock<HashMap<ExtractRef, char>> = LazyLock::new(|| {
     .collect()
 });
 
+/// Returns a `str` serialized from a `Decimal` to the appropriate signed overpunch respresentation.
+///
+/// # Arguments
+///
+/// * `value` - The `Decimal` value to serialize.
+/// * `field_format` - The signed overpunch picture format.
+///
+/// # Example
+///
+/// ```
+/// # use overpunch::convert_to_signed_format;
+/// # use rust_decimal::Decimal;
+///
+/// let formatted = convert_to_signed_format(Decimal::from_str_exact("225.8").unwrap(), "s9(7)v99");
+/// assert_eq!(formatted, "2258{");
+/// ```
 pub fn convert_to_signed_format(value: Decimal, field_format: &str) -> Option<String> {
     let number_of_decimal_places = if let Some(pos) = field_format.find('v') {
         field_format[pos + 1..].len()
@@ -107,6 +123,22 @@ pub fn convert_to_signed_format(value: Decimal, field_format: &str) -> Option<St
     format(value, number_of_decimal_places as u32).ok()
 }
 
+/// Returns a `Decimal` parsed from an appropriate signed overpunch respresentation.
+///
+/// # Arguments
+///
+/// * `value` - The signed overpunch representation.
+/// * `field_format` - The signed overpunch picture format.
+///
+/// # Example
+///
+/// ```
+/// # use overpunch::convert_from_signed_format;
+/// # use rust_decimal::Decimal;
+///
+/// let number = convert_from_signed_format("2258{", "s9(7)v99");
+/// assert_eq!(number, Decimal::from_str_exact("225.8").unwrap());
+/// ```
 pub fn convert_from_signed_format(value: &str, field_format: &str) -> Option<Decimal> {
     let number_of_decimal_places = if let Some(pos) = field_format.find('v') {
         field_format[pos + 1..].len()
