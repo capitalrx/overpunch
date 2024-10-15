@@ -1,0 +1,12 @@
+[bans]
+multiple-versions = "deny"
+deny = []
+skip = []
+
+[licenses]
+confidence-threshold = 0.92
+allow = [
+    "BSD-2-Clause",
+    "ISC",
+    "MIT",
+]
