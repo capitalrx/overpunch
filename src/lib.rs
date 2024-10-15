@@ -1,7 +1,7 @@
 use std::collections::HashMap;
+use std::sync::LazyLock;
 
 use rust_decimal::{Decimal, RoundingStrategy};
-use std::sync::LazyLock;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -151,9 +151,7 @@ fn extract(raw: &str, decimals: usize) -> Result<Decimal, OverpunchError> {
     result.push_str(core.as_str());
     result.push(cent);
 
-    result
-        .parse::<Decimal>()
-        .map_err(|_| OverpunchError::ParseError(result))
+    result.parse::<Decimal>().map_err(|_| OverpunchError::ParseError(result))
 }
 
 fn format(value: Decimal, decimals: u32) -> Result<String, OverpunchError> {
