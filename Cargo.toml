@@ -3,10 +3,12 @@ name = "overpunch"
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
-license-file = "LICENSE"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 rust_decimal = "1.36.0"
 thiserror = "1.0.64"
+
+[dev-dependencies]
+test-log = { version = "0.2.16", features = ["trace"] }
