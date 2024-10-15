@@ -6,7 +6,7 @@ skip = []
 [licenses]
 confidence-threshold = 0.92
 allow = [
-    "BSD-2-Clause",
-    "ISC",
+    "Apache-2.0",
     "MIT",
+    "Unicode-DFS-2016",
 ]
