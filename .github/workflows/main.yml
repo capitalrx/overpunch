@@ -30,7 +30,7 @@ jobs:
         with:
           components: rustfmt
       - name: check format
-        run: actions-rust-lang/rustfmt@v1
+        uses: actions-rust-lang/rustfmt@v1
 
   clippy:
     name: cargo clippy
