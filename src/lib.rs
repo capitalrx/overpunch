@@ -110,7 +110,7 @@ static FORMAT_REF: LazyLock<HashMap<ExtractRef, char>> = LazyLock::new(|| {
 /// # use overpunch::convert_to_signed_format;
 /// # use rust_decimal::Decimal;
 ///
-/// let formatted = convert_to_signed_format(Decimal::from_str_exact("225.8").unwrap(), "s9(7)v99");
+/// let formatted = convert_to_signed_format(Decimal::from_str_exact("225.8").unwrap(), "s9(7)v99").unwrap();
 /// assert_eq!(formatted, "2258{");
 /// ```
 pub fn convert_to_signed_format(value: Decimal, field_format: &str) -> Option<String> {
@@ -120,7 +120,7 @@ pub fn convert_to_signed_format(value: Decimal, field_format: &str) -> Option<St
         0
     };
 
-    format(value, number_of_decimal_places as u32).ok()
+    format(value, number_of_decimal_places as usize).ok()
 }
 
 /// Returns a `Decimal` parsed from an appropriate signed overpunch respresentation.
@@ -136,7 +136,7 @@ pub fn convert_to_signed_format(value: Decimal, field_format: &str) -> Option<St
 /// # use overpunch::convert_from_signed_format;
 /// # use rust_decimal::Decimal;
 ///
-/// let number = convert_from_signed_format("2258{", "s9(7)v99");
+/// let number = convert_from_signed_format("2258{", "s9(7)v99").unwrap();
 /// assert_eq!(number, Decimal::from_str_exact("225.8").unwrap());
 /// ```
 pub fn convert_from_signed_format(value: &str, field_format: &str) -> Option<Decimal> {
@@ -188,13 +188,24 @@ fn extract(raw: &str, decimals: usize) -> Result<Decimal, OverpunchError> {
         .map_err(|_| OverpunchError::ParseError(result))
 }
 
-fn format(value: Decimal, decimals: u32) -> Result<String, OverpunchError> {
+fn format(value: Decimal, decimals: usize) -> Result<String, OverpunchError> {
     let sign = if value.is_sign_negative() { '-' } else { '+' };
-    let val_str = value
+    let base_val_str = value
         .abs()
-        .round_dp_with_strategy(decimals, RoundingStrategy::MidpointAwayFromZero)
-        .to_string()
-        .replace('.', "");
+        .round_dp_with_strategy(decimals.try_into().unwrap(), RoundingStrategy::MidpointAwayFromZero)
+        .to_string();
+
+    let parts: Vec<_> = base_val_str.splitn(2, ".").collect();
+
+    let (core, frac) = if parts.len() > 1 {
+        (parts[0], parts[1])
+    } else {
+        (parts[0], "")
+    };
+
+    let padded_frac = format!("{:0<width$}", frac, width = decimals);
+
+    let val_str = format!("{}{}", core, padded_frac);
 
     let last_char = val_str
         .chars()

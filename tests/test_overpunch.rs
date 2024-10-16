@@ -38,13 +38,26 @@ fn test_convert_from_signed_format() {
 #[test]
 fn test_convert_to_signed_format() {
     let mut patient_pay_amount =
+        convert_to_signed_format(Decimal::from_str_exact("225.8").unwrap(), "s9(7)v99").unwrap();
+    assert_eq!(patient_pay_amount, "2258{");
+
+    patient_pay_amount =
         convert_to_signed_format(Decimal::from_str_exact("225.80").unwrap(), "s9(7)v99").unwrap();
+    assert_eq!(patient_pay_amount, "2258{");
+
+    patient_pay_amount =
+        convert_to_signed_format(Decimal::from_str_exact("225.801").unwrap(), "s9(7)v99").unwrap();
     assert_eq!(patient_pay_amount, "2258{");
 
     patient_pay_amount =
         convert_to_signed_format(Decimal::from_str_exact("-12.3450").unwrap(), "s9(7)v9999")
             .unwrap();
     assert_eq!(patient_pay_amount, "12345}");
+
+    patient_pay_amount =
+        convert_to_signed_format(Decimal::from_str_exact("-12.3451").unwrap(), "s9(7)v9999")
+            .unwrap();
+    assert_eq!(patient_pay_amount, "12345J");
 
     let mut quantity_dispensed =
         convert_to_signed_format(Decimal::from_str_exact("30.000").unwrap(), "9(7)v999").unwrap();
