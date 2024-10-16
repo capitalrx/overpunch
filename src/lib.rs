@@ -120,7 +120,7 @@ pub fn convert_to_signed_format(value: Decimal, field_format: &str) -> Option<St
         0
     };
 
-    format(value, number_of_decimal_places as usize).ok()
+    format(value, number_of_decimal_places).ok()
 }
 
 /// Returns a `Decimal` parsed from an appropriate signed overpunch respresentation.
