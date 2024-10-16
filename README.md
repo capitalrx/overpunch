@@ -32,7 +32,7 @@ To parse signed overpunch numbers:
 use overpunch::convert_from_signed_format;
 use rust_decimal::Decimal;
 
-let number = convert_from_signed_format("2258{", "s9(7)v99");
+let number = convert_from_signed_format("2258{", "s9(7)v99").unwrap();
 assert_eq!(number, Decimal::from_str_exact("225.8").unwrap());
 ```
 
@@ -42,6 +42,6 @@ To format values to signed overpunch:
 use overpunch::convert_to_signed_format;
 use rust_decimal::Decimal;
 
-let formatted = convert_to_signed_format(Decimal::from_str_exact("225.8").unwrap(), "s9(7)v99");
+let formatted = convert_to_signed_format(Decimal::from_str_exact("225.8").unwrap(), "s9(7)v99").unwrap();
 assert_eq!(formatted, "2258{");
 ```
