@@ -192,7 +192,10 @@ fn format(value: Decimal, decimals: usize) -> Result<String, OverpunchError> {
     let sign = if value.is_sign_negative() { '-' } else { '+' };
     let base_val_str = value
         .abs()
-        .round_dp_with_strategy(decimals.try_into().unwrap(), RoundingStrategy::MidpointAwayFromZero)
+        .round_dp_with_strategy(
+            decimals.try_into().unwrap(),
+            RoundingStrategy::MidpointAwayFromZero,
+        )
         .to_string();
 
     let parts: Vec<_> = base_val_str.splitn(2, ".").collect();
