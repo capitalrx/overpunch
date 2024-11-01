@@ -21,7 +21,7 @@ Alternatively, you can edit your `Cargo.toml` directly and run `cargo update`:
 
 ```toml
 [dependencies]
-overpunch = "0.1.0"
+overpunch = "0.2.0"
 ```
 
 ## Usage
