@@ -1,11 +1,14 @@
-use criterion::{criterion_group, criterion_main, Criterion};
+use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use overpunch::{convert_from_signed_format, convert_to_signed_format};
 use rust_decimal::Decimal;
 
 fn bench_convert_from_signed_format(c: &mut Criterion) {
     c.bench_function("convert_from_signed_format", |b| {
         b.iter(|| {
-            convert_from_signed_format("123{", "s9(7)v99");
+            black_box(convert_from_signed_format(
+                black_box("123{"),
+                black_box("s9(7)v99"),
+            ));
         })
     });
 }
@@ -15,7 +18,10 @@ fn bench_convert_to_signed_format(c: &mut Criterion) {
 
     c.bench_function("convert_to_signed_format", |b| {
         b.iter(|| {
-            convert_to_signed_format(val, "s9(7)v99");
+            black_box(convert_to_signed_format(
+                black_box(val),
+                black_box("s9(7)v99"),
+            ));
         })
     });
 }
