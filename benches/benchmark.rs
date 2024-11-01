@@ -1,7 +1,6 @@
 use criterion::{criterion_group, criterion_main, Criterion};
 use overpunch::{convert_from_signed_format, convert_to_signed_format};
 use rust_decimal::Decimal;
-use std::hint::black_box;
 
 fn bench_convert_from_signed_format(c: &mut Criterion) {
     c.bench_function("convert_from_signed_format", |b| {
