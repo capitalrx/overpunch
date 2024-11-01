@@ -18,3 +18,8 @@ thiserror = "1.0.64"
 
 [dev-dependencies]
 test-log = { version = "0.2.16", features = ["trace"] }
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[[bench]]
+name = "benchmark"
+harness = false
