@@ -66,7 +66,7 @@ pub fn convert_from_signed_format(value: &str, field_format: &str) -> Option<Dec
     extract(value, number_of_decimal_places).ok()
 }
 
-fn extract(raw: &str, decimals: usize) -> Result<Decimal, OverpunchError> {
+pub fn extract(raw: &str, decimals: usize) -> Result<Decimal, OverpunchError> {
     let length = raw.len();
     if length == 0 {
         return Err(OverpunchError::EmptyField);
@@ -120,11 +120,16 @@ fn extract(raw: &str, decimals: usize) -> Result<Decimal, OverpunchError> {
         }
     }
 
-    Ok(Decimal::new(val, decimals.try_into().unwrap()))
+    let scale = if decimals > length {
+        (decimals - length) as u32
+    } else {
+        decimals as u32
+    };
+
+    Ok(Decimal::new(val, scale))
 }
 
-fn format(value: Decimal, decimals: usize) -> Result<String, OverpunchError> {
-
+pub fn format(value: Decimal, decimals: usize) -> Result<String, OverpunchError> {
     let is_negative: bool = value.is_sign_negative();
 
     let scale_factor: Decimal = Decimal::new(10_i64.pow(decimals.try_into().unwrap()), 0);
@@ -169,7 +174,6 @@ fn format(value: Decimal, decimals: usize) -> Result<String, OverpunchError> {
     v.push(c);
 
     while as_int > 0 {
-
         last_digit = as_int % 10;
         as_int = as_int / 10;
 
@@ -188,6 +192,10 @@ fn format(value: Decimal, decimals: usize) -> Result<String, OverpunchError> {
         };
 
         v.push(c);
+    }
+
+    while v.len() < decimals + 1 {
+        v.push('0');
     }
 
     v.reverse();
