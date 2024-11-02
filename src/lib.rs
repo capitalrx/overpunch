@@ -116,7 +116,7 @@ pub fn extract(raw: &str, decimals: usize) -> Result<Decimal, OverpunchError> {
 
         val = val * 10 + char_val;
         if sign < 0 {
-            val = val * sign;
+            val *= sign;
         }
     }
 
@@ -145,7 +145,7 @@ pub fn format(value: Decimal, decimals: usize) -> Result<String, OverpunchError>
     let mut v: Vec<char> = Vec::with_capacity(10);
 
     let mut last_digit = as_int % 10;
-    as_int = as_int / 10;
+    as_int /= 10;
 
     let mut c = match (is_negative, last_digit) {
         (false, 0) => '{',
@@ -175,7 +175,7 @@ pub fn format(value: Decimal, decimals: usize) -> Result<String, OverpunchError>
 
     while as_int > 0 {
         last_digit = as_int % 10;
-        as_int = as_int / 10;
+        as_int /= 10;
 
         c = match last_digit {
             0 => '0',
