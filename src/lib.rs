@@ -74,6 +74,8 @@ pub fn extract(raw: &str, decimals: usize) -> Result<Decimal, OverpunchError> {
 
     let mut val: i64 = 0;
 
+    let mut sign: i64 = 1;
+
     for c in raw.chars() {
         let char_val: i64 = match c {
             '0' => 0,
@@ -109,7 +111,7 @@ pub fn extract(raw: &str, decimals: usize) -> Result<Decimal, OverpunchError> {
             _ => return Err(OverpunchError::ParseError(raw.to_string())),
         };
 
-        let sign: i64 = match c {
+        sign = match c {
             '}' | 'J' | 'K' | 'L' | 'M' | 'N' | 'O' | 'P' | 'Q' | 'R' => -1,
             _ => 1,
         };
@@ -126,7 +128,13 @@ pub fn extract(raw: &str, decimals: usize) -> Result<Decimal, OverpunchError> {
         decimals as u32
     };
 
-    Ok(Decimal::new(val, scale))
+    let extracted = if val == 0 && sign == -1 {
+        -Decimal::new(val, scale)
+    } else {
+        Decimal::new(val, scale)
+    };
+
+    Ok(extracted)
 }
 
 pub fn format(value: Decimal, decimals: usize) -> Result<String, OverpunchError> {
