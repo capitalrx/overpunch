@@ -184,35 +184,34 @@ fn test_convert_to_signed_format() {
         .unwrap();
     assert_eq!(value, "12345G");
 
-    value = convert_to_signed_format(Decimal::from_str_exact("0.0008").unwrap(), "s9(9)v99")
-        .unwrap();
+    value =
+        convert_to_signed_format(Decimal::from_str_exact("0.0008").unwrap(), "s9(9)v99").unwrap();
     assert_eq!(value, "00{");
 
-    value = convert_to_signed_format(Decimal::from_str_exact("0.008").unwrap(), "s9(9)v99")
-        .unwrap();
+    value =
+        convert_to_signed_format(Decimal::from_str_exact("0.008").unwrap(), "s9(9)v99").unwrap();
     assert_eq!(value, "00A");
 
-    value = convert_to_signed_format(Decimal::from_str_exact("0.004").unwrap(), "s9(9)v99")
-        .unwrap();
+    value =
+        convert_to_signed_format(Decimal::from_str_exact("0.004").unwrap(), "s9(9)v99").unwrap();
     assert_eq!(value, "00{");
 
-    value = convert_to_signed_format(Decimal::from_str_exact("0.08").unwrap(), "s9(9)v99")
-        .unwrap();
+    value = convert_to_signed_format(Decimal::from_str_exact("0.08").unwrap(), "s9(9)v99").unwrap();
     assert_eq!(value, "00H");
 
-    value = convert_to_signed_format(Decimal::from_str_exact("-0.008").unwrap(), "s9(9)v99")
-        .unwrap();
+    value =
+        convert_to_signed_format(Decimal::from_str_exact("-0.008").unwrap(), "s9(9)v99").unwrap();
     assert_eq!(value, "00J");
 
-    value = convert_to_signed_format(Decimal::from_str_exact("-0.004").unwrap(), "s9(9)v99")
-        .unwrap();
+    value =
+        convert_to_signed_format(Decimal::from_str_exact("-0.004").unwrap(), "s9(9)v99").unwrap();
     assert_eq!(value, "00}");
 
-    value = convert_to_signed_format(Decimal::from_str_exact("0.004").unwrap(), "s9(9)v999")
-        .unwrap();
+    value =
+        convert_to_signed_format(Decimal::from_str_exact("0.004").unwrap(), "s9(9)v999").unwrap();
     assert_eq!(value, "000D");
 
-    value = convert_to_signed_format(Decimal::from_str_exact("0.004").unwrap(), "s9(9)v9999")
-        .unwrap();
+    value =
+        convert_to_signed_format(Decimal::from_str_exact("0.004").unwrap(), "s9(9)v9999").unwrap();
     assert_eq!(value, "0004{");
 }
