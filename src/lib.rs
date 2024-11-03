@@ -66,6 +66,22 @@ pub fn convert_from_signed_format(value: &str, field_format: &str) -> Option<Dec
     extract(value, number_of_decimal_places).ok()
 }
 
+/// Returns a `Decimal` parsed from an appropriate signed overpunch respresentation.
+///
+/// # Arguments
+///
+/// * `value` - The signed overpunch representation.
+/// * `decimals` - The number of digits following the decimal point that this value has.
+///
+/// # Example
+///
+/// ```
+/// # use overpunch::extract;
+/// # use rust_decimal::Decimal;
+///
+/// let number = extract("2258{", 2).unwrap();
+/// assert_eq!(number, Decimal::from_str_exact("225.8").unwrap());
+/// ```
 pub fn extract(raw: &str, decimals: usize) -> Result<Decimal, OverpunchError> {
     let length = raw.len();
     if length == 0 {
@@ -128,6 +144,23 @@ pub fn extract(raw: &str, decimals: usize) -> Result<Decimal, OverpunchError> {
     Ok(extracted)
 }
 
+/// Returns a `str` serialized from a `Decimal` to the appropriate signed overpunch respresentation.
+///
+/// # Arguments
+///
+/// * `value` - The `Decimal` value to serialize.
+/// * `decimals` - The number of digits following the decimal point that the signed overpunch
+/// picture implies.
+///
+/// # Example
+///
+/// ```
+/// # use overpunch::format;
+/// # use rust_decimal::Decimal;
+///
+/// let formatted = format(Decimal::from_str_exact("225.8").unwrap(), 2).unwrap();
+/// assert_eq!(formatted, "2258{");
+/// ```
 pub fn format(value: Decimal, decimals: usize) -> Result<String, OverpunchError> {
     let is_negative: bool = value.is_sign_negative();
 
