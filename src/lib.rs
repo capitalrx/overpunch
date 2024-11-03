@@ -117,21 +117,12 @@ pub fn extract(raw: &str, decimals: usize) -> Result<Decimal, OverpunchError> {
         };
 
         val = val * 10 + char_val;
-        if sign < 0 {
-            val *= sign;
-        }
     }
 
-    let scale = if decimals > length {
-        (decimals - length) as u32
+    let extracted = if sign == -1 {
+        -Decimal::new(val, decimals as u32)
     } else {
-        decimals as u32
-    };
-
-    let extracted = if val == 0 && sign == -1 {
-        -Decimal::new(val, scale)
-    } else {
-        Decimal::new(val, scale)
+        Decimal::new(val, decimals as u32)
     };
 
     Ok(extracted)
