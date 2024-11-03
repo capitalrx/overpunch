@@ -150,7 +150,7 @@ pub fn extract(raw: &str, decimals: usize) -> Result<Decimal, OverpunchError> {
 ///
 /// * `value` - The `Decimal` value to serialize.
 /// * `decimals` - The number of digits following the decimal point that the signed overpunch
-/// picture implies.
+///   picture implies.
 ///
 /// # Example
 ///
