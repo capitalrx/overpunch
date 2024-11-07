@@ -1,6 +1,8 @@
+use memchr::memchr;
 use rust_decimal::prelude::ToPrimitive;
 use rust_decimal::Decimal;
 use thiserror::Error;
+use std::mem::ManuallyDrop;
 
 #[derive(Error, Debug)]
 pub enum OverpunchError {
@@ -31,11 +33,8 @@ pub enum OverpunchError {
 /// assert_eq!(formatted, "2258{");
 /// ```
 pub fn convert_to_signed_format(value: Decimal, field_format: &str) -> Option<String> {
-    let number_of_decimal_places = if let Some(pos) = field_format.find('v') {
-        field_format[pos + 1..].len()
-    } else {
-        0
-    };
+    let number_of_decimal_places = memchr(b'v', field_format.as_bytes())
+        .map_or(0, |pos| field_format[pos + 1..].len());
 
     format(value, number_of_decimal_places).ok()
 }
@@ -57,11 +56,8 @@ pub fn convert_to_signed_format(value: Decimal, field_format: &str) -> Option<St
 /// assert_eq!(number, Decimal::from_str_exact("225.8").unwrap());
 /// ```
 pub fn convert_from_signed_format(value: &str, field_format: &str) -> Option<Decimal> {
-    let number_of_decimal_places = if let Some(pos) = field_format.find('v') {
-        field_format[pos + 1..].len()
-    } else {
-        0
-    };
+    let number_of_decimal_places = memchr(b'v', field_format.as_bytes())
+        .map_or(0, |pos| field_format[pos + 1..].len());
 
     extract(value, number_of_decimal_places).ok()
 }
@@ -83,57 +79,57 @@ pub fn convert_from_signed_format(value: &str, field_format: &str) -> Option<Dec
 /// assert_eq!(number, Decimal::from_str_exact("225.8").unwrap());
 /// ```
 pub fn extract(raw: &str, decimals: usize) -> Result<Decimal, OverpunchError> {
-    let length = raw.len();
-    if length == 0 {
+    if raw.is_empty() {
         return Err(OverpunchError::EmptyField);
     }
 
     let mut val: i64 = 0;
+    let mut last_char = b'0';
 
-    let mut sign: i64 = 1;
-
-    for c in raw.chars() {
+    for c in raw.bytes() {
         let char_val: i64 = match c {
-            '0' => 0,
-            '1' => 1,
-            '2' => 2,
-            '3' => 3,
-            '4' => 4,
-            '5' => 5,
-            '6' => 6,
-            '7' => 7,
-            '8' => 8,
-            '9' => 9,
-            '{' => 0,
-            'A' => 1,
-            'B' => 2,
-            'C' => 3,
-            'D' => 4,
-            'E' => 5,
-            'F' => 6,
-            'G' => 7,
-            'H' => 8,
-            'I' => 9,
-            '}' => 0,
-            'J' => 1,
-            'K' => 2,
-            'L' => 3,
-            'M' => 4,
-            'N' => 5,
-            'O' => 6,
-            'P' => 7,
-            'Q' => 8,
-            'R' => 9,
+            b'0' => 0,
+            b'1' => 1,
+            b'2' => 2,
+            b'3' => 3,
+            b'4' => 4,
+            b'5' => 5,
+            b'6' => 6,
+            b'7' => 7,
+            b'8' => 8,
+            b'9' => 9,
+            b'{' => 0,
+            b'A' => 1,
+            b'B' => 2,
+            b'C' => 3,
+            b'D' => 4,
+            b'E' => 5,
+            b'F' => 6,
+            b'G' => 7,
+            b'H' => 8,
+            b'I' => 9,
+            b'}' => 0,
+            b'J' => 1,
+            b'K' => 2,
+            b'L' => 3,
+            b'M' => 4,
+            b'N' => 5,
+            b'O' => 6,
+            b'P' => 7,
+            b'Q' => 8,
+            b'R' => 9,
             _ => return Err(OverpunchError::ParseError(raw.to_string())),
         };
 
-        sign = match c {
-            '}' | 'J' | 'K' | 'L' | 'M' | 'N' | 'O' | 'P' | 'Q' | 'R' => -1,
-            _ => 1,
-        };
+        last_char = c;
 
         val = val * 10 + char_val;
     }
+
+    let sign: i64 = match last_char {
+        b'}' | b'J' | b'K' | b'L' | b'M' | b'N' | b'O' | b'P' | b'Q' | b'R' => -1,
+        _ => 1,
+    };
 
     let extracted = if sign == -1 {
         -Decimal::new(val, decimals as u32)
@@ -174,32 +170,32 @@ pub fn format(value: Decimal, decimals: usize) -> Result<String, OverpunchError>
         None => return Err(OverpunchError::OverflowError(value.to_string())),
     };
 
-    let mut v: Vec<char> = Vec::with_capacity(10);
+    let mut v = Vec::with_capacity(10);
 
     let mut last_digit = as_int % 10;
     as_int /= 10;
 
     let mut c = match (is_negative, last_digit) {
-        (false, 0) => '{',
-        (false, 1) => 'A',
-        (false, 2) => 'B',
-        (false, 3) => 'C',
-        (false, 4) => 'D',
-        (false, 5) => 'E',
-        (false, 6) => 'F',
-        (false, 7) => 'G',
-        (false, 8) => 'H',
-        (false, 9) => 'I',
-        (true, 0) => '}',
-        (true, 1) => 'J',
-        (true, 2) => 'K',
-        (true, 3) => 'L',
-        (true, 4) => 'M',
-        (true, 5) => 'N',
-        (true, 6) => 'O',
-        (true, 7) => 'P',
-        (true, 8) => 'Q',
-        (true, 9) => 'R',
+        (false, 0) => b'{',
+        (false, 1) => b'A',
+        (false, 2) => b'B',
+        (false, 3) => b'C',
+        (false, 4) => b'D',
+        (false, 5) => b'E',
+        (false, 6) => b'F',
+        (false, 7) => b'G',
+        (false, 8) => b'H',
+        (false, 9) => b'I',
+        (true, 0) => b'}',
+        (true, 1) => b'J',
+        (true, 2) => b'K',
+        (true, 3) => b'L',
+        (true, 4) => b'M',
+        (true, 5) => b'N',
+        (true, 6) => b'O',
+        (true, 7) => b'P',
+        (true, 8) => b'Q',
+        (true, 9) => b'R',
         _ => unreachable!(),
     };
 
@@ -210,16 +206,16 @@ pub fn format(value: Decimal, decimals: usize) -> Result<String, OverpunchError>
         as_int /= 10;
 
         c = match last_digit {
-            0 => '0',
-            1 => '1',
-            2 => '2',
-            3 => '3',
-            4 => '4',
-            5 => '5',
-            6 => '6',
-            7 => '7',
-            8 => '8',
-            9 => '9',
+            0 => b'0',
+            1 => b'1',
+            2 => b'2',
+            3 => b'3',
+            4 => b'4',
+            5 => b'5',
+            6 => b'6',
+            7 => b'7',
+            8 => b'8',
+            9 => b'9',
             _ => unreachable!(),
         };
 
@@ -227,10 +223,14 @@ pub fn format(value: Decimal, decimals: usize) -> Result<String, OverpunchError>
     }
 
     while v.len() < decimals + 1 {
-        v.push('0');
+        v.push(b'0');
     }
 
     v.reverse();
+    let mut mdv = ManuallyDrop::new(v);
+    let formatted = unsafe {
+        String::from_raw_parts(mdv.as_mut_ptr(), mdv.len(), mdv.capacity())
+    };
 
-    Ok(String::from_iter(v))
+    Ok(formatted)
 }

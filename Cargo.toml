@@ -14,7 +14,8 @@ categories = ["finance", "parsing", "value-formatting"]
 
 [dependencies]
 rust_decimal = "1.36.0"
-thiserror = "1.0.64"
+thiserror = "2.0.0"
+memchr = "2.7.4"
 
 [dev-dependencies]
 test-log = { version = "0.2.16", features = ["trace"] }
